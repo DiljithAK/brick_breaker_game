@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:first_game_app/ui/widget/ball.dart';
-import 'package:first_game_app/ui/cover_screen.dart';
-import 'package:first_game_app/ui/widget/brick.dart';
-import 'package:first_game_app/ui/widget/game_over.dart';
-import 'package:first_game_app/ui/widget/player.dart';
+import 'package:brick_breaker_game/ui/cover_screen.dart';
+import 'package:brick_breaker_game/ui/widget/ball.dart';
+import 'package:brick_breaker_game/ui/widget/brick.dart';
+import 'package:brick_breaker_game/ui/widget/game_over.dart';
+import 'package:brick_breaker_game/ui/widget/player.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
