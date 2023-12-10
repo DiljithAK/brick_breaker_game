@@ -16,11 +16,13 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-enum direction { UP, DOWN }
+enum Direction { up, down, left, right }
 
 class _HomeScreenState extends State<HomeScreen> {
   double ballX = 0;
   double ballY = 0;
+  double ballXincrement = 0.01;
+  double ballYincrement = 0.01;
 
   double playerX = -0.2;
   double playerWidth = 0.4;
@@ -28,14 +30,30 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isGameStarted = false;
   bool isGameOver = false;
 
-  var ballDirection = direction.DOWN;
-
-  double brickX = 0;
-  double brickY = -0.9;
-  double brickWidth = 0.4;
-  double brickHeight = 0.05;
+  var ballXDirection = Direction.left;
+  var ballYDirection = Direction.down;
 
   bool brickBroken = false;
+
+  static double firstBrickX = -1 + wallGap;
+  static double firstBrickY = -0.9;
+  static double brickWidth = 0.4;
+  static double brickHeight = 0.05;
+  static double brickGap = 0.01;
+
+  static int numberOfBricksInEachRow = 3;
+  static double wallGap = 0.5 *
+      (2 -
+          numberOfBricksInEachRow * brickWidth -
+          (numberOfBricksInEachRow - 1) * brickGap);
+
+  List bricks = List.generate(numberOfBricksInEachRow, (index) {
+    double x = firstBrickX + index * (brickWidth + brickGap);
+    double y = firstBrickY;
+    bool isBrickBoken = false;
+
+    return [x, y, isBrickBoken];
+  });
 
   void startGame() {
     isGameStarted = true;
@@ -56,19 +74,31 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void moveBall() {
     setState(() {
-      if (ballDirection == direction.DOWN) {
-        ballY += 0.01;
-      } else if (ballDirection == direction.UP) {
-        ballY -= 0.01;
+      if (ballXDirection == Direction.left) {
+        ballX -= ballXincrement;
+      } else if (ballXDirection == Direction.right) {
+        ballX += ballXincrement;
+      }
+
+      if (ballYDirection == Direction.down) {
+        ballY += ballYincrement;
+      } else if (ballYDirection == Direction.up) {
+        ballY -= ballYincrement;
       }
     });
   }
 
   void updateDirection() {
     if (ballY >= 0.9 && ballX >= playerX && ballX <= playerX + playerWidth) {
-      ballDirection = direction.UP;
+      ballYDirection = Direction.up;
     } else if (ballY <= -1) {
-      ballDirection = direction.DOWN;
+      ballYDirection = Direction.down;
+    }
+
+    if (ballX >= 1) {
+      ballXDirection = Direction.left;
+    } else if (ballX <= -1) {
+      ballXDirection = Direction.right;
     }
   }
 
@@ -96,13 +126,63 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void checkForBrokenBricks() {
-    if (ballX >= brickX &&
-        ballX <= brickX + brickWidth &&
-        ballY <= brickY + brickHeight &&
-        brickBroken == false) {
-      brickBroken = true;
-      ballDirection = direction.DOWN;
+    for (var i = 0; i < bricks.length; i++) {
+      if (ballX >= bricks[i][0] &&
+          ballX <= bricks[i][0] + brickWidth &&
+          ballY <= bricks[i][1] + brickHeight &&
+          bricks[i][2] == false) {
+        bricks[i][2] = true;
+
+        double leftSideDist = (bricks[i][0] - ballX).abs();
+        double rightSideDist = ((bricks[i][0] + brickWidth) - ballX).abs();
+        double topSideDist = (bricks[i][1] - ballY).abs();
+        double bottonSideDist = ((bricks[i][1] + brickHeight) - ballY).abs();
+
+        String min =
+            findMin(leftSideDist, rightSideDist, topSideDist, bottonSideDist);
+
+        switch (min) {
+          case "left":
+            ballXDirection = Direction.left;
+            break;
+          case "right":
+            ballXDirection = Direction.right;
+            break;
+          case "up":
+            ballYDirection = Direction.up;
+            break;
+          case "bottom":
+            ballYDirection = Direction.down;
+            break;
+        }
+      }
     }
+  }
+
+  String findMin(
+    double left,
+    double right,
+    double top,
+    double bottom,
+  ) {
+    List<double> sideDist = [left, right, top, bottom];
+    double currentSide = left;
+    for (int i = 0; i < sideDist.length; i++) {
+      if (sideDist[i] < currentSide) {
+        currentSide = sideDist[i];
+      }
+    }
+
+    if ((currentSide - left).abs() < 0.01) {
+      return "left";
+    } else if ((currentSide - right).abs() < 0.01) {
+      return "right";
+    } else if ((currentSide - top).abs() < 0.01) {
+      return "top";
+    } else if ((currentSide - bottom).abs() < 0.01) {
+      return "bottom";
+    }
+    return "";
   }
 
   @override
@@ -130,13 +210,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Ball(ballX: ballX, ballY: ballY),
                 Player(playerX: playerX, playerWidth: playerWidth),
-                Brick(
-                  brickHeight: brickHeight,
-                  brickWidth: brickWidth,
-                  brickX: brickX,
-                  brickY: brickY,
-                  brickBroken: brickBroken,
-                ),
+                for (var brick in bricks)
+                  Brick(
+                    brickHeight: brickHeight,
+                    brickWidth: brickWidth,
+                    brickX: brick[0],
+                    brickY: brick[1],
+                    brickBroken: brick[2],
+                  ),
               ],
             ),
           ),
