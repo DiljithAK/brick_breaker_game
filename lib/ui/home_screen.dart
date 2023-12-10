@@ -7,7 +7,6 @@ import 'package:brick_breaker_game/ui/widget/game_over.dart';
 import 'package:brick_breaker_game/ui/widget/player.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +20,7 @@ enum Direction { up, down, left, right }
 class _HomeScreenState extends State<HomeScreen> {
   double ballX = 0;
   double ballY = 0;
-  double ballXincrement = 0.01;
+  double ballXincrement = 0.02;
   double ballYincrement = 0.01;
 
   double playerX = -0.2;
@@ -36,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool brickBroken = false;
 
   static double firstBrickX = -1 + wallGap;
-  static double firstBrickY = -0.9;
+  static double firstBrickY = -0.5;
   static double brickWidth = 0.4;
   static double brickHeight = 0.05;
   static double brickGap = 0.01;
@@ -185,18 +184,47 @@ class _HomeScreenState extends State<HomeScreen> {
     return "";
   }
 
+  void restartGame() {
+    setState(() {  
+      ballX = 0;
+      ballY = 0;
+      playerX = -0.2;
+      isGameStarted = false;
+      isGameOver = false;
+      bricks = List.generate(numberOfBricksInEachRow, (index) {
+        double x = firstBrickX + index * (brickWidth + brickGap);
+        double y = firstBrickY;
+        bool isBrickBoken = false;
+
+        return [x, y, isBrickBoken];
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
-      focusNode: FocusNode(),
-      autofocus: true,
-      onKey: (event) {
-        if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
-          moveLeft();
-        } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+    // return RawKeyboardListener(
+    //   focusNode: FocusNode(),
+    //   autofocus: true,
+    //   onKey: (event) {
+    //     if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+    //       moveLeft();
+    //     } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+    //       moveRight();
+    //     }
+    //   },
+    return GestureDetector(
+    onTap: startGame,
+    onPanUpdate: (details) {
+      // Detect horizontal drag for moving the player left or right
+      if (details.primaryDelta != null) {
+        if (details.primaryDelta! > 0) {
           moveRight();
+        } else if (details.primaryDelta! < 0) {
+          moveLeft();
         }
-      },
+      }
+    },
       child: GestureDetector(
         onTap: startGame,
         child: Scaffold(
@@ -207,8 +235,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 CoverScreen(isGameStarted: isGameStarted),
                 GameOver(
                   isGameOver: isGameOver,
+                  playAgain: restartGame,
                 ),
-                Ball(ballX: ballX, ballY: ballY),
+                Ball(ballX: ballX, ballY: ballY, isGameStarted: isGameStarted),
                 Player(playerX: playerX, playerWidth: playerWidth),
                 for (var brick in bricks)
                   Brick(
