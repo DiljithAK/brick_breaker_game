@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="brick_breaker_game"
+        android:label="Brick Breaker"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
