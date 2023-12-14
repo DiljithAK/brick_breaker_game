@@ -7,6 +7,7 @@ import 'package:brick_breaker_game/ui/widget/game_over.dart';
 import 'package:brick_breaker_game/ui/widget/player.dart';
 
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -230,13 +231,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      onPressed: () => moveLeft(),
-                      icon: const Icon(Icons.arrow_back, size: 25),
+                    Transform.rotate(
+                      angle: 180 * math.pi / 180,
+                      child: IconButton(
+                        onPressed: () => moveLeft(),
+                        icon: const Icon(Icons.play_circle_filled, size: 40),
+                      ),
                     ),
                     IconButton(
                       onPressed: () => moveRight(),
-                      icon: const Icon(Icons.arrow_forward, size: 25),
+                      icon: const Icon(Icons.play_circle_filled, size: 40),
                     ),
                   ],
                 ),
