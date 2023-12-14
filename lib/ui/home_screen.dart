@@ -7,7 +7,6 @@ import 'package:brick_breaker_game/ui/widget/game_over.dart';
 import 'package:brick_breaker_game/ui/widget/player.dart';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -204,69 +203,45 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return RawKeyboardListener(
-      focusNode: FocusNode(),
-      autofocus: true,
-      onKey: (event) {
-        if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
-          moveLeft();
-        } else if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
-          moveRight();
-        }
-      },
-      // return GestureDetector(
-      // onTap: startGame,
-      // onPanUpdate: (details) {
-      //   // Detect horizontal drag for moving the player left or right
-      //   if (details.primaryDelta != null) {
-      //     if (details.primaryDelta! > 0) {
-      //       moveRight();
-      //     } else if (details.primaryDelta! < 0) {
-      //       moveLeft();
-      //     }
-      //   }
-      // },
-      child: GestureDetector(
-        onTap: startGame,
-        child: Scaffold(
-          backgroundColor: Colors.deepPurple[100],
-          body: Center(
-            child: Stack(
-              children: [
-                CoverScreen(isGameStarted: isGameStarted),
-                GameOver(
-                  isGameOver: isGameOver,
-                  playAgain: restartGame,
+    return GestureDetector(
+      onTap: startGame,
+      child: Scaffold(
+        backgroundColor: Colors.deepPurple[100],
+        body: Center(
+          child: Stack(
+            children: [
+              CoverScreen(isGameStarted: isGameStarted),
+              GameOver(
+                isGameOver: isGameOver,
+                playAgain: restartGame,
+              ),
+              Ball(ballX: ballX, ballY: ballY, isGameStarted: isGameStarted),
+              Player(playerX: playerX, playerWidth: playerWidth),
+              for (var brick in bricks)
+                Brick(
+                  brickHeight: brickHeight,
+                  brickWidth: brickWidth,
+                  brickX: brick[0],
+                  brickY: brick[1],
+                  brickBroken: brick[2],
                 ),
-                Ball(ballX: ballX, ballY: ballY, isGameStarted: isGameStarted),
-                Player(playerX: playerX, playerWidth: playerWidth),
-                for (var brick in bricks)
-                  Brick(
-                    brickHeight: brickHeight,
-                    brickWidth: brickWidth,
-                    brickX: brick[0],
-                    brickY: brick[1],
-                    brickBroken: brick[2],
-                  ),
-                Container(
-                    alignment: Alignment(0, 1),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              moveLeft();
-                            },
-                            icon: Icon(Icons.arrow_back, size: 25,)),
-                        IconButton(
-                            onPressed: () {
-                              moveRight();
-                            },
-                            icon: Icon(Icons.arrow_forward, size: 25,)),
-                      ],
-                    ))
-              ],
-            ),
+              Container(
+                alignment: const Alignment(0, 1),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      onPressed: () => moveLeft(),
+                      icon: const Icon(Icons.arrow_back, size: 25),
+                    ),
+                    IconButton(
+                      onPressed: () => moveRight(),
+                      icon: const Icon(Icons.arrow_forward, size: 25),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
