@@ -21,17 +21,13 @@ class CoverScreen extends StatelessWidget {
             Container(
                 alignment: const Alignment(0, -0.2),
                 child: Text(
-                  'BRICK BRACKER',
-                  style: gameFont,
-                ),
-              ),
+                  'BRICK BRACKER',style: gameFont)),
             Container(
                 alignment: const Alignment(0, -0.1),
                 child: Text(
                   'Tap to Play',
-                  style: TextStyle(color: Colors.deepPurple[400]),
-                ),
-              ),
+                  style: TextStyle(color: Colors.deepPurple[400],
+                  )))
           ],
         );
   }
